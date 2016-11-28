@@ -1,11 +1,10 @@
-
 import autograd.numpy as np
-from autograd import grad
 
 EPS = 1e-15
 
 
 def unhot(function):
+    """Convert one-hot representation into one column."""
     def wrapper(actual, predicted):
         if len(actual.shape) > 1 and actual.shape[1] > 1:
             actual = actual.argmax(axis=1)
@@ -60,7 +59,6 @@ def root_mean_squared_log_error(actual, predicted):
 
 def logloss(actual, predicted):
     predicted = np.clip(predicted, EPS, 1 - EPS)
-    predicted /= predicted.sum(axis=1, keepdims=True)
     loss = -np.sum(actual * np.log(predicted))
     return loss / float(actual.shape[0])
 
@@ -69,9 +67,10 @@ def hinge(actual, predicted):
     return np.mean(np.max(1. - actual * predicted, 0.))
 
 
-def binary_crossentropy(predicted, actual):
+def binary_crossentropy(actual, predicted):
     predicted = np.clip(predicted, EPS, 1 - EPS)
-    return np.mean(-np.sum(actual * np.log(predicted) + (1 - actual) * np.log(1 - predicted)))
+    return np.mean(-np.sum(actual * np.log(predicted) +
+                           (1 - actual) * np.log(1 - predicted)))
 
 
 # aliases

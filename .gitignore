@@ -2,3 +2,5 @@
 build/
 dist/
 mla.egg-info/
+.cache
+*.swp

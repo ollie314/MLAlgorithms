@@ -1,13 +1,11 @@
-
-
 import numpy as np
 
 
 def check_data(a, b):
-    if isinstance(a, list):
+    if not isinstance(a, np.ndarray):
         a = np.array(a)
 
-    if isinstance(b, list):
+    if not isinstance(b, np.ndarray):
         b = np.array(b)
 
     if type(a) != type(b):

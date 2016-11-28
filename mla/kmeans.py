@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from mla.base import BaseEstimator
-from mla.metrics.distance import euclidian_distance
+from mla.metrics.distance import euclidean_distance
 
 random.seed(1111)
 
@@ -59,10 +59,12 @@ class KMeans(BaseEstimator):
         else:
             raise ValueError('Unknown type of init parameter')
 
-    def predict(self):
-        """Perform the clustering on the dataset."""
+    def _predict(self, X=None):
+        """Perform clustering on the dataset."""
         self._initialize_cetroids(self.init)
         centroids = self.centroids
+
+        # Optimize clusters
         for _ in range(self.max_iters):
             self._assign(centroids)
             centroids_old = centroids
@@ -95,10 +97,11 @@ class KMeans(BaseEstimator):
             self.clusters[closest].append(row)
 
     def _closest(self, fpoint, centroids):
+        """Find the closest centroid for a point."""
         closest_index = None
         closest_distance = None
         for i, point in enumerate(centroids):
-            dist = euclidian_distance(self.X[fpoint], point)
+            dist = euclidean_distance(self.X[fpoint], point)
             if closest_index is None or dist < closest_distance:
                 closest_index = i
                 closest_distance = dist
@@ -109,7 +112,8 @@ class KMeans(BaseEstimator):
         return [np.mean(np.take(self.X[:, i], cluster)) for i in range(self.n_features)]
 
     def _dist_from_centers(self):
-        return np.array([min([euclidian_distance(x, c) for c in self.centroids]) for x in self.X])
+        """Calculate distance from centers."""
+        return np.array([min([euclidean_distance(x, c) for c in self.centroids]) for x in self.X])
 
     def _choose_next_center(self):
         distances = self._dist_from_centers()
@@ -120,7 +124,11 @@ class KMeans(BaseEstimator):
         return self.X[ind]
 
     def _is_converged(self, centroids_old, centroids):
-        return True if sum([euclidian_distance(centroids_old[i], centroids[i]) for i in range(self.K)]) == 0 else False
+        """Check if the distance between old and new centroids is zero."""
+        distance = 0
+        for i in range(self.K):
+            distance += euclidean_distance(centroids_old[i], centroids[i])
+        return distance == 0
 
     def plot(self, data=None):
         sns.set(style="white")
